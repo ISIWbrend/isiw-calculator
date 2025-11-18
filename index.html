@@ -1,0 +1,3846 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор стоимости изделия | ISIW</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Калькулятор ISIW">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Калькулятор ISIW">
+    <meta name="description" content="Расчет стоимости изделий методом шитья">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#333333">
+    <meta name="theme-color" content="#333333">
+
+    <!-- Иконки -->
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        /* Ваши существующие стили остаются без изменений */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            position: relative;
+        }
+
+        .brand {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .header-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .header-btn:hover {
+            background-color: #555;
+        }
+
+        .header-btn.new {
+            background-color: #2196F3;
+        }
+
+        .header-btn.new:hover {
+            background-color: #0b7dda;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            border-radius: 4px 4px 0 0;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background-color: #f0f0f0;
+        }
+
+        .nav-tab.active {
+            border-bottom: 3px solid #333;
+            font-weight: bold;
+            background-color: #000;
+            color: white;
+        }
+
+        .section {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .subsection {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .color-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-input {
+            flex: 1;
+        }
+
+        .add-btn, .add-color-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .size-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+        }
+
+        .size-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .add-param-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .code-generation {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .code-part {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .final-code {
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .code-display {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            color: #222;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: #555;
+        }
+
+        .nav-btn:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        .save-btn {
+            background-color: #4CAF50;
+            margin-left: 10px;
+        }
+
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+
+        .remove-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+
+        .custom-params {
+            margin-top: 15px;
+        }
+
+        .custom-param {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .custom-param input {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        /* Стили для отображения изображения */
+        .image-preview-container {
+            max-width: 100%;
+            margin-top: 15px;
+            display: none;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        .image-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .image-control-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .image-control-btn.delete {
+            background-color: #f44336;
+        }
+
+        .image-control-btn.replace {
+            background-color: #2196F3;
+        }
+
+        /* Стили для раздела информации о клиенте */
+        .client-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .client-contact {
+            grid-column: 1 / -1;
+        }
+
+        .deadline-row {
+            grid-column: 1 / -1;
+        }
+
+        /* Стили для раздела временных затрат */
+        .time-task {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #333;
+        }
+
+        .time-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .time-task-name {
+            font-weight: bold;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .time-task-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .time-task-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-input-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .time-input {
+            width: 80px;
+        }
+
+        .time-unit {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .time-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Стили для раздела амортизации */
+        .equipment-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .equipment-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .time-usage-section {
+            grid-column: 1 / -1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .time-usage-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .time-usage-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #f9f9f9;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .time-usage-option input[type="checkbox"] {
+            width: auto;
+        }
+
+        .percentage-input {
+            width: 60px;
+            margin-left: 5px;
+        }
+
+        .equipment-total {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-weight: bold;
+        }
+
+        /* Стили для раздела ЗП */
+        .salary-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .salary-task {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .salary-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Стили для разделов расходов */
+        .expense-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .expense-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Стили для раздела Цена */
+        .calculation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .calculation-table th,
+        .calculation-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .calculation-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .calculation-table tr:last-child td {
+            border-bottom: 2px solid #333;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .calculation-table .subtotal {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+
+        .calculation-table .urgency {
+            color: #ff9800;
+        }
+
+        .calculation-table .tax {
+            color: #d32f2f;
+        }
+
+        .calculation-table .markup {
+            color: #388e3c;
+        }
+
+        .calculation-summary {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+        }
+
+        .summary-row.urgency {
+            color: #ff9800;
+        }
+
+        .summary-row.markup {
+            color: #388e3c;
+        }
+
+        .summary-row.tax {
+            color: #d32f2f;
+        }
+
+        /* Стили для истории расчетов */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .history-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .history-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .history-card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .history-card-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .history-card-code {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .history-card-client {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .history-card-phone {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .history-card-price {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .history-card-date {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .history-card-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .history-card-btn {
+            flex: 1;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .history-card-btn.edit {
+            background-color: #4CAF50;
+        }
+
+        .history-card-btn.create-copy {
+            background-color: #2196F3;
+        }
+
+        .history-card-btn.delete {
+            background-color: #f44336;
+        }
+
+        /* Новые стили для поля ФИО */
+        .client-fio-container {
+            grid-column: 1 / -1;
+        }
+
+        /* Стили для кастомного способа оплаты */
+        .custom-payment-container {
+            grid-column: 1 / -1;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Стили для кастомной валюты */
+        .custom-currency-input {
+            display: none;
+        }
+
+        /* Стили для поиска в истории */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        /* Стили для раздела материалов */
+        .materials-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .material-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .materials-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Стили для раздела упаковки и доставки */
+        .packaging-delivery-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .packaging-item, .delivery-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .packaging-delivery-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-tabs {
+                justify-content: flex-start;
+            }
+            
+            .nav-tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .client-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .equipment-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-task, .salary-task, .expense-item {
+                grid-template-columns: 1fr;
+            }
+            
+            .calculation-table {
+                font-size: 14px;
+            }
+            
+            .calculation-table th,
+            .calculation-table td {
+                padding: 8px 5px;
+            }
+
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-generation {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-buttons div {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .materials-header, .material-item {
+                grid-template-columns: 1fr;
+            }
+
+            .packaging-delivery-header, .packaging-item, .delivery-item {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
+            
+            h2 {
+                font-size: 20px;
+            }
+            
+            .nav-tab {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            
+            .color-input-group {
+                flex-direction: column;
+            }
+            
+            .size-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       
+
+ <header>
+    <h1>Калькулятор стоимости изделия</h1>
+    <p>Расчет стоимости изделия, изготовленного методом шитья</p>
+    <div class="header-controls">
+        <button class="header-btn new" id="new-calculation">Новый расчет</button>
+            </div>
+    <div class="brand">© ISIW 2025</div>
+</header>
+
+
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-section="description">Описание</button>
+            <button class="nav-tab" data-section="client">О клиенте</button>
+            <button class="nav-tab" data-section="materials">Материалы</button>
+            <button class="nav-tab" data-section="time">Временные затраты</button>
+            <button class="nav-tab" data-section="amortization">Амортизация</button>
+            <button class="nav-tab" data-section="salary">ЗП</button>
+            <button class="nav-tab" data-section="packaging">Упаковка и доставка</button>
+            <button class="nav-tab" data-section="overhead">Накладные</button>
+            <button class="nav-tab" data-section="price">Цена</button>
+            <button class="nav-tab" data-section="history">История</button>
+        </div>
+
+        <!-- Секция ОПИСАНИЕ -->
+        <section id="description" class="section active">
+            <h2>Описание изделия</h2>
+            
+            <div class="subsection">
+                <h3>Название изделия</h3>
+                <div class="form-group">
+                    <input type="text" id="product-name" placeholder="Введите название изделия">
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3>Фото изделия</h3>
+                <div class="form-group">
+                    <input type="file" id="product-photo" accept="image/*">
+                </div>
+                <div class="image-preview-container" id="image-preview-container">
+                    <img id="preview-image" src="#" alt="Предпросмотр изображения" class="image-preview">
+                    <div class="image-controls">
+                        <button class="image-control-btn replace" id="replace-image">Заменить изображение</button>
+                        <button class="image-control-btn delete" id="delete-image">Удалить изображение</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3>Цвета изделия</h3>
+                <div class="color-palette" id="color-palette">
+                    <div class="color-option" style="background-color: #000000;" data-color="#000000" data-name="Черный"></div>
+                    <div class="color-option" style="background-color: #ffffff; border: 1px solid #ddd;" data-color="#ffffff" data-name="Белый"></div>
+                    <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000" data-name="Красный"></div>
+                    <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff" data-name="Синий"></div>
+                    <div class="color-option" style="background-color: #008000;" data-color="#008000" data-name="Зеленый"></div>
+                    <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00" data-name="Желтый"></div>
+                    <div class="color-option" style="background-color: #ffa500;" data-color="#ffa500" data-name="Оранжевый"></div>
+                    <div class="color-option" style="background-color: #800080;" data-color="#800080" data-name="Фиолетовый"></div>
+                    <div class="color-option" style="background-color: #ffc0cb;" data-color="#ffc0cb" data-name="Розовый"></div>
+                    <div class="color-option" style="background-color: #a52a2a;" data-color="#a52a2a" data-name="Коричневый"></div>
+                </div>
+                <div class="color-input-group">
+                    <input type="color" class="color-input" id="custom-color" value="#cccccc">
+                    <input type="text" id="custom-color-name" placeholder="Название цвета">
+                    <button class="add-color-btn" id="add-custom-color">+ Добавить цвет</button>
+                </div>
+                <div id="selected-colors" class="selected-colors" style="margin-top: 15px;"></div>
+            </div>
+            
+            <div class="subsection">
+                <h3>Описание изделия</h3>
+                <div class="form-group">
+                    <textarea id="product-description" placeholder="Введите описание, заметки или пометки"></textarea>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3>Размеры и прибавки</h3>
+                <div id="default-sizes">
+                    <div class="size-inputs">
+                        <div class="size-input">
+                            <label for="ot-size">ОТ (обхват талии), см</label>
+                            <input type="number" id="ot-size" min="0" step="0.1">
+                        </div>
+                        <div class="size-input">
+                            <label for="ot-ease">Прибавка ОТ, см</label>
+                            <input type="number" id="ot-ease" min="0" step="0.1">
+                        </div>
+                        <button class="remove-btn" id="remove-ot">×</button>
+                    </div>
+                    <div class="size-inputs">
+                        <div class="size-input">
+                            <label for="og-size">ОГ (обхват груди), см</label>
+                            <input type="number" id="og-size" min="0" step="0.1">
+                        </div>
+                        <div class="size-input">
+                            <label for="og-ease">Прибавка ОГ, см</label>
+                            <input type="number" id="og-ease" min="0" step="0.1">
+                        </div>
+                        <button class="remove-btn" id="remove-og">×</button>
+                    </div>
+                    <div class="size-inputs">
+                        <div class="size-input">
+                            <label for="ob-size">ОБ (обхват бедер), см</label>
+                            <input type="number" id="ob-size" min="0" step="0.1">
+                        </div>
+                        <div class="size-input">
+                            <label for="ob-ease">Прибавка ОБ, см</label>
+                            <input type="number" id="ob-ease" min="0" step="0.1">
+                        </div>
+                        <button class="remove-btn" id="remove-ob">×</button>
+                    </div>
+                </div>
+                <button class="add-param-btn" id="add-custom-param">+ Добавить параметр</button>
+                <div class="custom-params" id="custom-params"></div>
+            </div>
+            
+            <div class="subsection">
+                <h3>Валюта</h3>
+                <div class="form-group">
+                    <select id="currency">
+                        <option value="BYN">Белорусский рубль (BYN)</option>
+                        <option value="RUB">Российский рубль (RUB)</option>
+                        <option value="USD">Доллар США (USD)</option>
+                        <option value="EUR">Евро (EUR)</option>
+                        <option value="UAH">Украинская гривна (UAH)</option>
+                        <option value="custom">Другая валюта</option>
+                    </select>
+                </div>
+                <div class="form-group custom-currency-input" id="custom-currency-container">
+                    <input type="text" id="custom-currency" placeholder="Введите название валюты">
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <div></div>
+                <div>
+                    <button class="nav-btn" data-next="client">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция О КЛИЕНТЕ -->
+        <section id="client" class="section">
+            <h2>О клиенте</h2>
+            
+            <div class="client-info-grid">
+                <div class="form-group client-fio-container">
+                    <label for="client-fio">ФИО</label>
+                    <input type="text" id="client-fio" placeholder="Введите фамилию, имя и отчество">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-phone">Телефон</label>
+                    <input type="tel" id="client-phone" placeholder="+375 (XX) XXX-XX-XX">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-email">Email</label>
+                    <input type="email" id="client-email" placeholder="email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-social">Социальные сети</label>
+                    <input type="text" id="client-social" placeholder="Instagram, VK, Telegram и т.д.">
+                </div>
+                
+                <div class="form-group client-contact">
+                    <label for="client-address">Адрес доставки</label>
+                    <textarea id="client-address" placeholder="Введите полный адрес доставки"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payment-method">Способ оплаты</label>
+                    <select id="payment-method">
+                        <option value="cash">Наличные</option>
+                        <option value="card">Банковская карта</option>
+                        <option value="transfer">Банковский перевод</option>
+                        <option value="online">Онлайн-платеж</option>
+                        <option value="other">Другой способ</option>
+                    </select>
+                </div>
+                
+                <div class="form-group custom-payment-container" id="custom-payment-container">
+                    <input type="text" id="custom-payment" placeholder="Введите ваш способ оплаты">
+                </div>
+                
+                <div class="form-group deadline-row">
+                    <label for="desired-deadline">Желаемый срок выполнения</label>
+                    <input type="date" id="desired-deadline">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="client-notes">Примечания</label>
+                <textarea id="client-notes" placeholder="Дополнительная информация о клиенте или заказе"></textarea>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="description">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="materials">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция МАТЕРИАЛЫ -->
+        <section id="materials" class="section">
+            <h2>Материалы</h2>
+            
+            <div class="materials-header">
+                <div>Название</div>
+                <div>Примечание</div>
+                <div>Где куплено</div>
+                <div>Единица измерения</div>
+                <div>Расход</div>
+                <div>Цена за ед.</div>
+                <div></div>
+            </div>
+            
+            <div id="materials-container"></div>
+            
+            <button class="add-btn" id="add-material">+ Добавить материал</button>
+            
+            <div class="materials-total">
+                Итого по материалам: <span id="total-materials">0.00</span> <span id="materials-currency">BYN</span>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="client">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="time">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция ВРЕМЕННЫЕ ЗАТРАТЫ -->
+        <section id="time" class="section">
+            <h2>Временные затраты</h2>
+            
+            <div id="time-tasks-container"></div>
+            
+            <button class="add-btn" id="add-time-task">+ Добавить задачу</button>
+            
+            <div class="time-total">
+                Итого затраченное время: <span id="total-time">0 часов 0 минут</span>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="materials">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="amortization">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция АМОРТИЗАЦИЯ -->
+        <section id="amortization" class="section">
+            <h2>Амортизация оборудования</h2>
+            
+            <div id="equipment-container"></div>
+            
+            <button class="add-btn" id="add-equipment">+ Добавить оборудование</button>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="time">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="salary">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция ЗП -->
+        <section id="salary" class="section">
+            <h2>Заработная плата</h2>
+            
+            <div class="salary-header">
+                <div>Задача</div>
+                <div>Время (мин)</div>
+                <div>Ставка (в час)</div>
+                <div>Сумма</div>
+            </div>
+            
+            <div id="salary-tasks-container"></div>
+            
+            <div class="salary-total">
+                Итого заработная плата: <span id="total-salary">0.00</span> <span id="salary-currency">BYN</span>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="amortization">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="packaging">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция УПАКОВКА И ДОСТАВКА -->
+        <section id="packaging" class="section">
+            <h2>Упаковка и доставка</h2>
+            
+            <h3>Упаковка</h3>
+            <div class="packaging-delivery-header">
+                <div>Тип</div>
+                <div>Примечание</div>
+                <div>Стоимость</div>
+                <div></div>
+            </div>
+            
+            <div id="packaging-container"></div>
+            
+            <button class="add-btn" id="add-packaging">+ Добавить упаковку</button>
+            
+            <h3 style="margin-top: 30px;">Доставка</h3>
+            <div class="packaging-delivery-header">
+                <div>Тип</div>
+                <div>Примечание</div>
+                <div>Стоимость</div>
+                <div></div>
+            </div>
+            
+            <div id="delivery-container"></div>
+            
+            <button class="add-btn" id="add-delivery">+ Добавить доставку</button>
+            
+            <div class="packaging-delivery-total">
+                Итого по упаковке и доставке: <span id="total-packaging-delivery">0.00</span> <span id="packaging-currency">BYN</span>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="salary">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="overhead">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция НАКЛАДНЫЕ -->
+        <section id="overhead" class="section">
+            <h2>Накладные расходы</h2>
+            <p>Расчет ежемесячных затрат, которые распределяются на стоимость каждого изделия</p>
+            
+            <!-- Подраздел 1: Коммунальные услуги -->
+            <div class="subsection">
+                <h3>Коммунальные услуги</h3>
+                <div class="form-group">
+                    <label for="electricity-tariff">Тариф на электроэнергию (<span class="currency-symbol">BYN</span>/кВт·ч)</label>
+                    <input type="number" id="electricity-tariff" min="0" step="0.0001" placeholder="0.0000" value="0.2">
+                </div>
+                
+                <div class="form-group">
+                    <label for="water-tariff">Тариф на водоснабжение (<span class="currency-symbol">BYN</span>/мес)</label>
+                    <input type="number" id="water-tariff" min="0" step="0.01" placeholder="0.00" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="heating-tariff">Тариф на отопление (<span class="currency-symbol">BYN</span>/мес)</label>
+                    <input type="number" id="heating-tariff" min="0" step="0.01" placeholder="0.00" value="25">
+                </div>
+            </div>
+            
+            <!-- Подраздел 2: Расходные материалы и маркетинг -->
+            <div class="subsection">
+                <h3>Расходные материалы и маркетинг</h3>
+                <div class="form-group">
+                    <label for="office-supplies">Канцелярия, хоз. нужды (<span class="currency-symbol">BYN</span>/мес)</label>
+                    <input type="number" id="office-supplies" min="0" step="0.01" placeholder="0.00" value="15">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tags-materials">Бирки, логотипы (<span class="currency-symbol">BYN</span>/мес)</label>
+                    <input type="number" id="tags-materials" min="0" step="0.01" placeholder="0.00" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="marketing-cost">Маркетинг и реклама (<span class="currency-symbol">BYN</span>/мес)</label>
+                    <input type="number" id="marketing-cost" min="0" step="0.01" placeholder="0.00" value="50">
+                </div>
+            </div>
+            
+            <!-- Подраздел 3: Постоянные ежемесячные платежи -->
+            <div class="subsection">
+                <h3>Постоянные ежемесячные платежи</h3>
+                <div id="monthly-payments-container">
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Аренда мастерской (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Интернет и связь (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Обслуживание оборудования (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Программное обеспечение (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Охрана и безопасность (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Уборка (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                    <div class="monthly-payment-item">
+                        <div class="form-group">
+                            <label>Юридическая консультация (<span class="currency-symbol">BYN</span>/мес)</label>
+                            <input type="number" min="0" step="0.01" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Подраздел 4: Плановые рабочие часы -->
+            <div class="subsection">
+                <h3>Рабочее время</h3>
+                <div class="form-group">
+                    <label for="planned-work-hours">Плановое количество рабочих часов в месяц</label>
+                    <input type="number" id="planned-work-hours" min="0" step="0.5" placeholder="0.0" value="160">
+                </div>
+            </div>
+            
+            <!-- Итоговый расчет накладных расходов -->
+            <div class="subsection">
+                <h3>Итоговый расчет накладных расходов</h3>
+                <div class="calculation-summary">
+                    <div class="summary-row">
+                        <span>Суммарные месячные накладные расходы:</span>
+                        <span id="total-monthly-overhead">0.00 <span class="currency-symbol">BYN</span>/мес</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Коммунальные услуги (электроэнергия, вода, отопление):</span>
+                        <span id="utilities-cost">0.00 <span class="currency-symbol">BYN</span></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Стоимость накладных расходов на изделие:</span>
+                        <span id="overhead-cost-per-product">0.00 <span class="currency-symbol">BYN</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="packaging">Назад</button>
+                <div>
+                    <button class="nav-btn" data-next="price">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция ЦЕНА -->
+        <section id="price" class="section">
+            <h2>Цена изделия</h2>
+            
+            <div class="subsection">
+                <h3>Параметры расчета</h3>
+                <div class="form-group">
+                    <label for="urgency-percent">Процент за срочность (%)</label>
+                    <input type="number" id="urgency-percent" min="0" max="100" step="0.1" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="markup-percent">Наценка (чистый доход) (%)</label>
+                    <input type="number" id="markup-percent" min="0" max="100" step="0.1" value="10">
+                </div>
+                <div class="form-group">
+                    <label for="tax-percent">Налоги (%)</label>
+                    <input type="number" id="tax-percent" min="0" max="100" step="0.1" value="10">
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3>Сводка затрат</h3>
+                <table class="calculation-table">
+                    <thead>
+                        <tr>
+                            <th>Статья расходов</th>
+                            <th>Сумма</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Материалы</td>
+                            <td id="result-materials">0.00 BYN</td>
+                        </tr>
+                        <tr>
+                            <td>Заработная плата</td>
+                            <td id="result-salary">0.00 BYN</td>
+                        </tr>
+                        <tr>
+                            <td>Амортизация оборудования</td>
+                            <td id="result-amortization">0.00 BYN</td>
+                        </tr>
+                        <tr>
+                            <td>Упаковка и доставка</td>
+                            <td id="result-packaging">0.00 BYN</td>
+                        </tr>
+                        <tr>
+                            <td>Накладные расходы</td>
+                            <td id="result-overhead">0.00 BYN</td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td>Себестоимость</td>
+                            <td id="result-cost">0.00 BYN</td>
+                        </tr>
+                        <tr class="urgency">
+                            <td>Надбавка за срочность (<span id="urgency-percent-display">0</span>%)</td>
+                            <td id="result-urgency">0.00 BYN</td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td>Цена с учетом срочности</td>
+                            <td id="result-price-with-urgency">0.00 BYN</td>
+                        </tr>
+                        <tr class="markup">
+                            <td>Наценка (<span id="markup-percent-display">10</span>%)</td>
+                            <td id="result-markup">0.00 BYN</td>
+                        </tr>
+                        <tr class="subtotal">
+                            <td>Цена без налога</td>
+                            <td id="result-price-without-tax">0.00 BYN</td>
+                        </tr>
+                        <tr class="tax">
+                            <td>Налоги (<span id="tax-percent-display">10</span>%)</td>
+                            <td id="result-tax">0.00 BYN</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Итоговая стоимость</strong></td>
+                            <td id="result-total"><strong>0.00 BYN</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="overhead">Назад</button>
+                <div>
+                    <button class="nav-btn save-btn" id="save-calculation">Сохранить расчет</button>
+                    <button class="nav-btn" data-next="history">Далее</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция ИСТОРИЯ -->
+        <section id="history" class="section">
+            <h2>История расчетов</h2>
+            
+            <div class="search-container">
+                <input type="text" id="history-search" class="search-input" placeholder="Поиск по названию изделия (используйте % для неполного совпадения)">
+            </div>
+            
+            <div id="history-container">
+                <p>Здесь будут отображаться сохраненные расчеты</p>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" data-prev="price">Назад</button>
+                <div>
+                    <button class="nav-btn" disabled>Далее</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Подключаем IndexedDB -->
+    <script src="db.js"></script>
+
+    <script>
+        // Основная функция инициализации
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Инициализация базы данных
+            try {
+                await window.calculationDB.init();
+                console.log('База данных инициализирована');
+            } catch (error) {
+                console.error('Ошибка инициализации базы данных:', error);
+            }
+            
+            // Инициализация навигации
+            initNavigation();
+            
+            // Инициализация раздела описания
+            initDescription();
+            
+            // Инициализация раздела информации о клиенте
+            initClient();
+            
+            // Инициализация раздела материалов
+            initMaterials();
+            
+            // Инициализация раздела временных затрат
+            initTime();
+            
+            // Инициализация раздела амортизации
+            initAmortization();
+            
+            // Инициализация раздела ЗП
+            initSalary();
+            
+            // Инициализация раздела упаковки и доставки
+            initPackaging();
+            
+            // Инициализация раздела накладных расходов
+            initOverhead();
+            
+            // Инициализация итогового расчета
+            initPrice();
+            
+            // Инициализация истории
+            await initHistory();
+            
+            // Обновляем валюту во всех разделах после загрузки
+            updateCurrencyInAllSections();
+
+            // Регистрация Service Worker для PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('./sw.js');
+      console.log('✅ Service Worker зарегистрирован:', registration);
+      
+      // Ждем пока Service Worker будет готов
+      if (registration.installing) {
+        console.log('Service Worker устанавливается');
+      } else if (registration.waiting) {
+        console.log('Service Worker ожидает');
+      } else if (registration.active) {
+        console.log('✅ Service Worker активен');
+      }
+    } catch (error) {
+      console.error('❌ Ошибка регистрации Service Worker:', error);
+    }
+  });
+}
+
+// Обработчик установки PWA
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('✅ PWA можно установить!');
+  // Предотвращаем автоматическое показ prompt
+  e.preventDefault();
+  // Сохраняем событие для использования позже
+  deferredPrompt = e;
+  
+  // Показываем кнопку установки
+  showInstallButton();
+});
+
+function showInstallButton() {
+  // Удаляем старую кнопку если есть
+  const oldBtn = document.getElementById('install-pwa-btn');
+  if (oldBtn) oldBtn.remove();
+  
+  // Создаем кнопку установки
+  const installBtn = document.createElement('button');
+  installBtn.id = 'install-pwa-btn';
+  installBtn.innerHTML = '📱 Установить приложение';
+  installBtn.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 10000;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  `;
+  
+  installBtn.onclick = async () => {
+    if (!deferredPrompt) {
+      alert('Приложение уже установлено или установка недоступна');
+      return;
+    }
+    
+    // Показываем prompt установки
+    deferredPrompt.prompt();
+    
+    // Ждем выбора пользователя
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('✅ Пользователь установил приложение');
+      installBtn.style.display = 'none';
+    } else {
+      console.log('❌ Пользователь отказался от установки');
+    }
+    
+    // Очищаем ссылку
+    deferredPrompt = null;
+  };
+  
+  document.body.appendChild(installBtn);
+}
+
+// Событие когда приложение установлено
+window.addEventListener('appinstalled', () => {
+  console.log('🎉 PWA было установлено!');
+  const installBtn = document.getElementById('install-pwa-btn');
+  if (installBtn) installBtn.style.display = 'none';
+});
+
+            // Обработчик установки приложения
+            let installPrompt = null;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                installPrompt = e;
+                showInstallButton();
+            });
+
+            function showInstallButton() {
+                const installBtn = document.createElement('button');
+                installBtn.textContent = '📱 Установить приложение';
+                installBtn.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: #333;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    z-index: 1000;
+                    font-size: 14px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `;
+                
+                installBtn.onclick = async () => {
+                    if (!installPrompt) return;
+                    
+                    installPrompt.prompt();
+                    const { outcome } = await installPrompt.userChoice;
+                    
+                    if (outcome === 'accepted') {
+                        console.log('Пользователь установил приложение');
+                        installBtn.remove();
+                    }
+                    
+                    installPrompt = null;
+                };
+                
+                document.body.appendChild(installBtn);
+                
+                setTimeout(() => {
+                    if (installBtn.parentNode) {
+                        installBtn.remove();
+                    }
+                }, 10000);
+            }
+        });
+
+        // Функция инициализации навигации
+        function initNavigation() {
+            // Навигация по вкладкам
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetSection = this.getAttribute('data-section');
+                    showSection(targetSection);
+                    
+                    // Обновление активной вкладки
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Навигация по кнопкам "Назад" и "Далее"
+            const navButtons = document.querySelectorAll('.nav-btn[data-prev], .nav-btn[data-next]');
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.hasAttribute('data-prev')) {
+                        const prevSection = this.getAttribute('data-prev');
+                        showSection(prevSection);
+                        
+                        // Обновление активной вкладки
+                        navTabs.forEach(tab => {
+                            tab.classList.remove('active');
+                            if (tab.getAttribute('data-section') === prevSection) {
+                                tab.classList.add('active');
+                            }
+                        });
+                    } else if (this.hasAttribute('data-next')) {
+                        const nextSection = this.getAttribute('data-next');
+                        showSection(nextSection);
+                        
+                        // Обновление активной вкладки
+                        navTabs.forEach(tab => {
+                            tab.classList.remove('active');
+                            if (tab.getAttribute('data-section') === nextSection) {
+                                tab.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Кнопка нового расчета
+            document.getElementById('new-calculation').addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите начать новый расчет? Все несохраненные данные будут потеряны.')) {
+                    resetAllData();
+                    showSection('description');
+                    
+                    // Обновление активной вкладки
+                    navTabs.forEach(tab => {
+                        tab.classList.remove('active');
+                        if (tab.getAttribute('data-section') === 'description') {
+                            tab.classList.add('active');
+                        }
+                    });
+                }
+            });
+            
+            // Сохранение данных только в разделе итогового расчета
+            document.getElementById('save-calculation').addEventListener('click', function() {
+                saveCalculationToHistory();
+            });
+        }
+
+        // Функция сброса всех данных
+        function resetAllData() {
+            // Очистка раздела описания
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-description').value = '';
+            document.getElementById('product-photo').value = '';
+            document.getElementById('preview-image').src = '#';
+            document.getElementById('image-preview-container').style.display = 'none';
+            
+            // Очистка выбранных цветов
+            const selectedColorsContainer = document.getElementById('selected-colors');
+            selectedColorsContainer.innerHTML = '';
+            
+            // Сброс цветовых опций
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Сброс размеров
+            document.getElementById('ot-size').value = '';
+            document.getElementById('ot-ease').value = '';
+            document.getElementById('og-size').value = '';
+            document.getElementById('og-ease').value = '';
+            document.getElementById('ob-size').value = '';
+            document.getElementById('ob-ease').value = '';
+            
+            // Очистка пользовательских параметров
+            const customParamsContainer = document.getElementById('custom-params');
+            customParamsContainer.innerHTML = '';
+            
+            // Сброс валюты
+            document.getElementById('currency').value = 'BYN';
+            document.getElementById('custom-currency-container').style.display = 'none';
+            document.getElementById('custom-currency').value = '';
+            
+            // Очистка раздела клиента
+            document.getElementById('client-fio').value = '';
+            document.getElementById('client-phone').value = '';
+            document.getElementById('client-email').value = '';
+            document.getElementById('client-social').value = '';
+            document.getElementById('client-address').value = '';
+            document.getElementById('payment-method').value = 'cash';
+            document.getElementById('custom-payment-container').style.display = 'none';
+            document.getElementById('custom-payment').value = '';
+            document.getElementById('desired-deadline').value = '';
+            document.getElementById('client-notes').value = '';
+            
+            // Очистка раздела материалов
+            const materialsContainer = document.getElementById('materials-container');
+            materialsContainer.innerHTML = '';
+            // Добавляем один пустой материал
+            if (window.addMaterialItem) {
+                addMaterialItem();
+            }
+            
+            // Очистка раздела временных затрат
+            const timeTasksContainer = document.getElementById('time-tasks-container');
+            timeTasksContainer.innerHTML = '';
+            // Добавляем задачи по умолчанию
+            if (window.initTime) {
+                initTime();
+            }
+            
+            // Очистка раздела амортизации
+            const equipmentContainer = document.getElementById('equipment-container');
+            equipmentContainer.innerHTML = '';
+            
+            // Очистка раздела ЗП
+            const salaryContainer = document.getElementById('salary-tasks-container');
+            salaryContainer.innerHTML = '';
+            
+            // Очистка раздела упаковки и доставки
+            const packagingContainer = document.getElementById('packaging-container');
+            const deliveryContainer = document.getElementById('delivery-container');
+            packagingContainer.innerHTML = '';
+            deliveryContainer.innerHTML = '';
+            // Добавляем по одному пустому пункту
+            if (window.addPackagingItem && window.addDeliveryItem) {
+                addPackagingItem();
+                addDeliveryItem();
+            }
+            
+            // Сброс раздела накладных расходов к значениям по умолчанию
+            document.getElementById('electricity-tariff').value = '0.2';
+            document.getElementById('water-tariff').value = '10';
+            document.getElementById('heating-tariff').value = '25';
+            document.getElementById('office-supplies').value = '15';
+            document.getElementById('tags-materials').value = '10';
+            document.getElementById('marketing-cost').value = '50';
+            document.getElementById('planned-work-hours').value = '160';
+            
+            const monthlyPaymentInputs = document.querySelectorAll('.monthly-payment-item input[type="number"]');
+            monthlyPaymentInputs.forEach(input => {
+                input.value = '0';
+            });
+            
+            // Сброс раздела цены
+            document.getElementById('urgency-percent').value = '0';
+            document.getElementById('markup-percent').value = '10';
+            document.getElementById('tax-percent').value = '10';
+            
+            // Обновление итогового расчета
+            setTimeout(updateFinalCalculation, 100);
+            
+            // Обновление валюты
+            updateCurrencyInAllSections();
+        }
+
+        // Функция показа секции
+        function showSection(sectionId) {
+            console.log('Showing section:', sectionId);
+            
+            // Скрыть все секции
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Показать целевую секцию
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            } else {
+                console.error('Section not found:', sectionId);
+                return;
+            }
+            
+            // Обновить активное состояние вкладок навигации
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-section') === sectionId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Дополнительная логика для специфических разделов
+            if (sectionId === 'price') {
+                setTimeout(updateFinalCalculation, 100);
+            }
+            
+            if (sectionId === 'salary') {
+                setTimeout(() => {
+                    if (window.updateSalaryFromTime) {
+                        window.updateSalaryFromTime();
+                    }
+                }, 100);
+            }
+            
+            if (sectionId === 'overhead') {
+                calculateTotalOverhead();
+            }
+            
+            if (sectionId === 'amortization') {
+                refreshEquipmentTimeUsageOptions();
+            }
+            
+            if (sectionId === 'history') {
+                initHistory();
+            }
+        }
+
+        // Инициализация раздела описания
+        function initDescription() {
+            // Предпросмотр изображения
+            const photoInput = document.getElementById('product-photo');
+            const previewImage = document.getElementById('preview-image');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const replaceImageBtn = document.getElementById('replace-image');
+            const deleteImageBtn = document.getElementById('delete-image');
+            
+            photoInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.addEventListener('load', function() {
+                        previewImage.src = reader.result;
+                        imagePreviewContainer.style.display = 'block';
+                    });
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreviewContainer.style.display = 'none';
+                }
+            });
+            
+            // Кнопка замены изображения
+            replaceImageBtn.addEventListener('click', function() {
+                photoInput.click();
+            });
+            
+            // Кнопка удаления изображения
+            deleteImageBtn.addEventListener('click', function() {
+                photoInput.value = '';
+                previewImage.src = '#';
+                imagePreviewContainer.style.display = 'none';
+            });
+            
+            // Выбор цвета
+            const colorOptions = document.querySelectorAll('.color-option');
+            const selectedColorsContainer = document.getElementById('selected-colors');
+            const selectedColors = new Map();
+            
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    const name = this.getAttribute('data-name');
+                    
+                    if (selectedColors.has(color)) {
+                        selectedColors.delete(color);
+                        this.classList.remove('selected');
+                    } else {
+                        selectedColors.set(color, {name, color});
+                        this.classList.add('selected');
+                    }
+                    
+                    updateSelectedColorsDisplay();
+                });
+            });
+            
+            // Добавление пользовательского цвета
+            document.getElementById('add-custom-color').addEventListener('click', function() {
+                const customColor = document.getElementById('custom-color').value;
+                const customName = document.getElementById('custom-color-name').value || 'Пользовательский цвет';
+                
+                if (!selectedColors.has(customColor)) {
+                    selectedColors.set(customColor, {name: customName, color: customColor});
+                    updateSelectedColorsDisplay();
+                }
+            });
+            
+            // Обновление отображения выбранных цветов
+            function updateSelectedColorsDisplay() {
+                selectedColorsContainer.innerHTML = '';
+                
+                selectedColors.forEach((colorObj, color) => {
+                    const colorElement = document.createElement('div');
+                    colorElement.className = 'custom-param';
+                    
+                    const colorBox = document.createElement('div');
+                    colorBox.style.width = '20px';
+                    colorBox.style.height = '20px';
+                    colorBox.style.backgroundColor = color;
+                    colorBox.style.border = '1px solid #ddd';
+                    colorBox.style.marginRight = '10px';
+                    
+                    const colorText = document.createElement('span');
+                    colorText.textContent = `${colorObj.name} (${color})`;
+                    colorText.style.flex = '1';
+                    colorText.style.wordBreak = 'break-word';
+                    
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'remove-btn';
+                    removeButton.textContent = '×';
+                    removeButton.addEventListener('click', function() {
+                        selectedColors.delete(color);
+                        updateSelectedColorsDisplay();
+                        
+                        // Также убрать выделение с цветового круга, если он есть
+                        colorOptions.forEach(option => {
+                            if (option.getAttribute('data-color') === color) {
+                                option.classList.remove('selected');
+                            }
+                        });
+                    });
+                    
+                    colorElement.appendChild(colorBox);
+                    colorElement.appendChild(colorText);
+                    colorElement.appendChild(removeButton);
+                    
+                    selectedColorsContainer.appendChild(colorElement);
+                });
+            }
+            
+            // Удаление стандартных размеров
+            document.getElementById('remove-ot').addEventListener('click', function() {
+                document.getElementById('ot-size').parentElement.parentElement.remove();
+            });
+            
+            document.getElementById('remove-og').addEventListener('click', function() {
+                document.getElementById('og-size').parentElement.parentElement.remove();
+            });
+            
+            document.getElementById('remove-ob').addEventListener('click', function() {
+                document.getElementById('ob-size').parentElement.parentElement.remove();
+            });
+            
+            // Добавление пользовательских параметров размеров
+            document.getElementById('add-custom-param').addEventListener('click', function() {
+                const customParamsContainer = document.getElementById('custom-params');
+                
+                const paramElement = document.createElement('div');
+                paramElement.className = 'custom-param';
+                
+                const paramInput = document.createElement('input');
+                paramInput.type = 'text';
+                paramInput.placeholder = 'Название параметра';
+                
+                const valueInput = document.createElement('input');
+                valueInput.type = 'number';
+                valueInput.placeholder = 'Значение';
+                valueInput.min = '0';
+                valueInput.step = '0.1';
+                
+                const easeInput = document.createElement('input');
+                easeInput.type = 'number';
+                easeInput.placeholder = 'Прибавка';
+                easeInput.min = '0';
+                easeInput.step = '0.1';
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-btn';
+                removeButton.textContent = '×';
+                removeButton.addEventListener('click', function() {
+                    customParamsContainer.removeChild(paramElement);
+                });
+                
+                paramElement.appendChild(paramInput);
+                paramElement.appendChild(valueInput);
+                paramElement.appendChild(easeInput);
+                paramElement.appendChild(removeButton);
+                
+                customParamsContainer.appendChild(paramElement);
+            });
+            
+            // Обработка выбора валюты
+            document.getElementById('currency').addEventListener('change', function() {
+                const customCurrencyContainer = document.getElementById('custom-currency-container');
+                
+                if (this.value === 'custom') {
+                    customCurrencyContainer.style.display = 'block';
+                } else {
+                    customCurrencyContainer.style.display = 'none';
+                }
+                
+                // Обновляем валюту во всех разделах
+                updateCurrencyInAllSections();
+            });
+            
+            document.getElementById('custom-currency').addEventListener('input', function() {
+                // Обновляем валюту во всех разделах при изменении пользовательской валюты
+                updateCurrencyInAllSections();
+            });
+        }
+
+        // Функция обновления валюты во всех разделах
+        function updateCurrencyInAllSections() {
+            const currency = document.getElementById('currency').value;
+            const customCurrency = document.getElementById('custom-currency').value;
+            const currencySymbol = currency === 'custom' ? customCurrency : currency;
+            
+            // Обновляем валюту в разделе ЗП
+            document.getElementById('salary-currency').textContent = currencySymbol;
+            
+            // Обновляем валюту в разделе материалов
+            document.getElementById('materials-currency').textContent = currencySymbol;
+            
+            // Обновляем валюту в разделе упаковки и доставки
+            document.getElementById('packaging-currency').textContent = currencySymbol;
+            
+            // Обновляем валюту в разделе Цена
+            updateCurrencyInPriceSection(currencySymbol);
+            
+            // Обновляем валюту в разделе амортизации
+            updateCurrencyInAmortizationSection(currencySymbol);
+            
+            // Обновляем валюту в разделе накладных расходов
+            updateCurrencyInOverheadSection(currencySymbol);
+            
+            // Обновляем валюту в разделе истории
+            updateCurrencyInHistorySection(currencySymbol);
+        }
+
+        // Функция обновления валюты в разделе Цена
+        function updateCurrencyInPriceSection(currencySymbol) {
+            const elementsToUpdate = [
+                'result-salary', 'result-amortization', 
+                'result-materials', 'result-packaging',
+                'result-overhead', 'result-cost',
+                'result-urgency', 'result-price-with-urgency', 'result-markup',
+                'result-price-without-tax', 'result-tax', 'result-total'
+            ];
+            
+            elementsToUpdate.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const currentValue = element.textContent.split(' ')[0];
+                    element.textContent = `${currentValue} ${currencySymbol}`;
+                }
+            });
+        }
+
+        // Функция обновления валюты в разделе амортизации
+        function updateCurrencyInAmortizationSection(currencySymbol) {
+            // Обновляем валюту в стоимости оборудования
+            const equipmentCosts = document.querySelectorAll('.equipment-cost');
+            equipmentCosts.forEach(cost => {
+                const currentValue = cost.textContent.split(' ')[0];
+                cost.textContent = `${currentValue} ${currencySymbol}`;
+            });
+        }
+
+        // Функция обновления валюты в разделе накладных расходов
+        function updateCurrencyInOverheadSection(currencySymbol) {
+            // Обновляем валюту в заголовках
+            const currencySymbols = document.querySelectorAll('.currency-symbol');
+            currencySymbols.forEach(symbol => {
+                symbol.textContent = currencySymbol;
+            });
+            
+            // Обновляем валюту в суммах
+            const overheadSums = document.querySelectorAll('#total-monthly-overhead, #utilities-cost, #overhead-cost-per-product');
+            overheadSums.forEach(sum => {
+                const text = sum.textContent;
+                const numberMatch = text.match(/[\d.,]+/);
+                if (numberMatch) {
+                    const currentValue = numberMatch[0];
+                    const suffix = text.includes('/мес') ? '/мес' : '';
+                    sum.textContent = `${currentValue} ${currencySymbol}${suffix}`;
+                }
+            });
+        }
+
+        // Функция обновления валюты в разделе истории
+        function updateCurrencyInHistorySection(currencySymbol) {
+            // Обновляем валюту в карточках истории
+            const historyCards = document.querySelectorAll('.history-card-price');
+            historyCards.forEach(card => {
+                const currentText = card.textContent;
+                const parts = currentText.split(' ');
+                if (parts.length >= 3) {
+                    card.textContent = `${parts[0]} ${parts[1]} ${currencySymbol}`;
+                }
+            });
+        }
+
+        // Получение данных раздела описания
+        function getDescriptionData() {
+            const selectedColorsElements = document.querySelectorAll('.selected-colors .custom-param');
+            const colors = [];
+            
+            selectedColorsElements.forEach(el => {
+                const colorBox = el.querySelector('div');
+                const colorText = el.querySelector('span');
+                if (colorBox && colorText) {
+                    const color = colorBox.style.backgroundColor;
+                    const name = colorText.textContent.split(' (')[0];
+                    colors.push({name, color});
+                }
+            });
+            
+            return {
+                productName: document.getElementById('product-name').value,
+                colors: colors,
+                description: document.getElementById('product-description').value,
+                sizes: {
+                    ot: {
+                        size: document.getElementById('ot-size').value,
+                        ease: document.getElementById('ot-ease').value
+                    },
+                    og: {
+                        size: document.getElementById('og-size').value,
+                        ease: document.getElementById('og-ease').value
+                    },
+                    ob: {
+                        size: document.getElementById('ob-size').value,
+                        ease: document.getElementById('ob-ease').value
+                    }
+                },
+                customParams: Array.from(document.querySelectorAll('#custom-params .custom-param')).map(el => {
+                    return {
+                        name: el.children[0].value,
+                        value: el.children[1].value,
+                        ease: el.children[2].value
+                    };
+                }),
+                currency: document.getElementById('currency').value,
+                customCurrency: document.getElementById('custom-currency').value,
+                photoData: document.getElementById('preview-image').src
+            };
+        }
+
+        // Загрузка данных раздела описания
+        function loadDescriptionData(data) {
+            if (!data) return;
+            
+            document.getElementById('product-name').value = data.productName || '';
+            document.getElementById('product-description').value = data.description || '';
+            
+            // Загрузка изображения
+            if (data.photoData && data.photoData !== '#') {
+                document.getElementById('preview-image').src = data.photoData;
+                document.getElementById('image-preview-container').style.display = 'block';
+            }
+            
+            // Загрузка размеров
+            if (data.sizes) {
+                document.getElementById('ot-size').value = data.sizes.ot?.size || '';
+                document.getElementById('ot-ease').value = data.sizes.ot?.ease || '';
+                document.getElementById('og-size').value = data.sizes.og?.size || '';
+                document.getElementById('og-ease').value = data.sizes.og?.ease || '';
+                document.getElementById('ob-size').value = data.sizes.ob?.size || '';
+                document.getElementById('ob-ease').value = data.sizes.ob?.ease || '';
+            }
+            
+            // Загрузка валюты
+            document.getElementById('currency').value = data.currency || 'BYN';
+            if (data.currency === 'custom') {
+                document.getElementById('custom-currency-container').style.display = 'block';
+                document.getElementById('custom-currency').value = data.customCurrency || '';
+            }
+        }
+
+        // Инициализация раздела информации о клиенте
+        function initClient() {
+            // Обработка способа оплаты
+            const paymentMethodSelect = document.getElementById('payment-method');
+            const customPaymentContainer = document.getElementById('custom-payment-container');
+            
+            paymentMethodSelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    customPaymentContainer.style.display = 'block';
+                    document.getElementById('custom-payment').value = '';
+                } else {
+                    customPaymentContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // Получение данных раздела информации о клиенте
+        function getClientData() {
+            const paymentMethod = document.getElementById('payment-method').value;
+            let paymentValue = paymentMethod;
+            if (paymentMethod === 'other') {
+                paymentValue = document.getElementById('custom-payment').value || 'Другой способ';
+            }
+            
+            return {
+                fio: document.getElementById('client-fio').value,
+                phone: document.getElementById('client-phone').value,
+                address: document.getElementById('client-address').value,
+                email: document.getElementById('client-email').value,
+                social: document.getElementById('client-social').value,
+                paymentMethod: paymentValue,
+                deadline: document.getElementById('desired-deadline').value,
+                notes: document.getElementById('client-notes').value
+            };
+        }
+
+        // Загрузка данных раздела информации о клиенте
+        function loadClientData(data) {
+            if (!data) return;
+            
+            document.getElementById('client-fio').value = data.fio || '';
+            document.getElementById('client-phone').value = data.phone || '';
+            document.getElementById('client-address').value = data.address || '';
+            document.getElementById('client-email').value = data.email || '';
+            document.getElementById('client-social').value = data.social || '';
+            
+            // Обработка способа оплаты
+            const paymentMethod = data.paymentMethod || 'cash';
+            let paymentValue = paymentMethod;
+            const paymentOptions = ['cash', 'card', 'transfer', 'online'];
+            if (!paymentOptions.includes(paymentMethod)) {
+                paymentValue = 'other';
+                document.getElementById('custom-payment').value = paymentMethod;
+                document.getElementById('custom-payment-container').style.display = 'block';
+            } else {
+                document.getElementById('payment-method').value = paymentValue;
+            }
+            
+            document.getElementById('desired-deadline').value = data.deadline || '';
+            document.getElementById('client-notes').value = data.notes || '';
+        }
+
+        // Инициализация раздела материалов
+        function initMaterials() {
+            const materialsContainer = document.getElementById('materials-container');
+            const addMaterialBtn = document.getElementById('add-material');
+            
+            // Добавление нового материала
+            addMaterialBtn.addEventListener('click', function() {
+                addMaterialItem();
+            });
+            
+            function addMaterialItem(materialData = {}) {
+                const materialItem = document.createElement('div');
+                materialItem.className = 'material-item';
+                
+                materialItem.innerHTML = `
+                    <input type="text" value="${materialData.name || ''}" placeholder="Название материала" class="material-name">
+                    <input type="text" value="${materialData.note || ''}" placeholder="Примечание" class="material-note">
+                    <input type="text" value="${materialData.purchaseLocation || ''}" placeholder="Где куплено" class="material-purchase">
+                    <select class="material-unit">
+                        <option value="m" ${materialData.unit === 'm' ? 'selected' : ''}>м</option>
+                        <option value="cm" ${materialData.unit === 'cm' ? 'selected' : ''}>см</option>
+                        <option value="mm" ${materialData.unit === 'mm' ? 'selected' : ''}>мм</option>
+                        <option value="pcs" ${materialData.unit === 'pcs' ? 'selected' : ''}>шт</option>
+                        <option value="kg" ${materialData.unit === 'kg' ? 'selected' : ''}>кг</option>
+                        <option value="g" ${materialData.unit === 'g' ? 'selected' : ''}>гр</option>
+                        <option value="spool" ${materialData.unit === 'spool' ? 'selected' : ''}>катушка</option>
+                        <option value="roll" ${materialData.unit === 'roll' ? 'selected' : ''}>рулон</option>
+                        <option value="pack" ${materialData.unit === 'pack' ? 'selected' : ''}>упаковка</option>
+                        <option value="sheet" ${materialData.unit === 'sheet' ? 'selected' : ''}>лист</option>
+                    </select>
+                    <input type="number" value="${materialData.quantity || ''}" min="0" step="0.001" placeholder="0.000" class="material-quantity">
+                    <input type="number" value="${materialData.price || ''}" min="0" step="0.01" placeholder="0.00" class="material-price">
+                    <button class="remove-btn remove-material-btn">×</button>
+                `;
+                
+                // Обработчик удаления
+                const removeBtn = materialItem.querySelector('.remove-material-btn');
+                removeBtn.addEventListener('click', function() {
+                    materialsContainer.removeChild(materialItem);
+                    updateMaterialsTotal();
+                    setTimeout(updateFinalCalculation, 100);
+                });
+                
+                // Обработчики изменений для пересчета стоимости
+                const inputs = materialItem.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        updateMaterialsTotal();
+                        setTimeout(updateFinalCalculation, 100);
+                    });
+                });
+                
+                materialsContainer.appendChild(materialItem);
+                
+                // Первоначальный расчет стоимости
+                updateMaterialsTotal();
+            }
+            
+            // Функция обновления общей стоимости материалов
+            function updateMaterialsTotal() {
+                let total = 0;
+                const materialItems = document.querySelectorAll('.material-item');
+                
+                materialItems.forEach(item => {
+                    const quantity = parseFloat(item.querySelector('.material-quantity').value) || 0;
+                    const price = parseFloat(item.querySelector('.material-price').value) || 0;
+                    total += quantity * price;
+                });
+                
+                // Получаем валюту для отображения
+                const currency = document.getElementById('currency').value;
+                const customCurrency = document.getElementById('custom-currency').value;
+                const currencySymbol = currency === 'custom' ? customCurrency : currency;
+                
+                document.getElementById('total-materials').textContent = total.toFixed(2);
+                document.getElementById('materials-currency').textContent = currencySymbol;
+            }
+            
+            // Добавляем один пустой материал по умолчанию
+            addMaterialItem();
+        }
+
+        // Получение данных раздела материалов
+        function getMaterialsData() {
+            const materialItems = document.querySelectorAll('.material-item');
+            return Array.from(materialItems).map(item => {
+                return {
+                    name: item.querySelector('.material-name').value,
+                    note: item.querySelector('.material-note').value,
+                    purchaseLocation: item.querySelector('.material-purchase').value,
+                    unit: item.querySelector('.material-unit').value,
+                    quantity: item.querySelector('.material-quantity').value,
+                    price: item.querySelector('.material-price').value
+                };
+            });
+        }
+
+        // Загрузка данных раздела материалов
+        function loadMaterialsData(data) {
+            if (!data) return;
+            
+            const materialsContainer = document.getElementById('materials-container');
+            materialsContainer.innerHTML = '';
+            
+            if (data.length > 0) {
+                data.forEach(material => {
+                    addMaterialItem(material);
+                });
+            } else {
+                // Добавляем пустой материал, если нет данных
+                addMaterialItem();
+            }
+        }
+
+        // Инициализация раздела временных затрат
+        function initTime() {
+            const timeTasksContainer = document.getElementById('time-tasks-container');
+            const totalTimeElement = document.getElementById('total-time');
+
+            // Задачи по умолчанию
+            const defaultTimeTasks = [
+                {
+                    name: 'Снятие мерок',
+                    description: 'Снятие мерок, анализ фигуры',
+                    time: ''
+                },
+                {
+                    name: 'Разработка модели',
+                    description: 'Эскиз, техническое задание, выбор стиля, определение ассортимента',
+                    time: ''
+                },
+                {
+                    name: 'Конструкторская разработка',
+                    description: 'Создание лекал, корректировка посадки',
+                    time: ''
+                },
+                {
+                    name: 'Выбор и закупка материалов и фурнитуры',
+                    description: 'Поиск ткани, ниток, пуговиц, молний и т.д., приобретение и доставка',
+                    time: ''
+                },
+                {
+                    name: 'Расчёт себестоимости и планирование',
+                    description: 'План производства, нормы времени',
+                    time: ''
+                },
+                {
+                    name: 'Раскрой ткани',
+                    description: 'Разметка, настил, вырезание деталей',
+                    time: ''
+                },
+                {
+                    name: 'Подготовка к пошиву',
+                    description: 'Проверка лекал, маркировка деталей',
+                    time: ''
+                },
+                {
+                    name: 'Пошив изделия',
+                    description: 'Стачивание, обработка швов, втачивание рукавов, воротников и т.д.',
+                    time: ''
+                },
+                {
+                    name: 'ВТО',
+                    description: 'Глажение, отпаривание, фиксация формы',
+                    time: ''
+                },
+                {
+                    name: 'Контроль качества',
+                    description: 'Проверка размеров, дефектов, посадки',
+                    time: ''
+                },
+                {
+                    name: 'Финишная отделка',
+                    description: 'Пришивание пуговиц, застёжек, бирок',
+                    time: ''
+                },
+                {
+                    name: 'Упаковка',
+                    description: 'Складирование, маркировка, упаковка в пакеты/коробки',
+                    time: ''
+                },
+                {
+                    name: 'Доставка',
+                    description: '',
+                    time: ''
+                }
+            ];
+
+            // Добавление задач по умолчанию
+            defaultTimeTasks.forEach(task => {
+                addTimeTask(task.name, task.description, task.time);
+            });
+
+            // Добавление новой задачи
+            document.getElementById('add-time-task').addEventListener('click', function() {
+                addTimeTask('', '', '');
+            });
+
+            function addTimeTask(taskName, taskDescription, timeValue) {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'time-task';
+                taskElement.draggable = true;
+                
+                const taskHeader = document.createElement('div');
+                taskHeader.className = 'time-task-header';
+                
+                const dragHandle = document.createElement('span');
+                dragHandle.className = 'drag-handle';
+                dragHandle.textContent = '☰';
+                dragHandle.style.marginRight = '10px';
+                
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.value = taskName;
+                nameInput.placeholder = 'Название задачи';
+                nameInput.className = 'time-task-name';
+                
+                const taskControls = document.createElement('div');
+                taskControls.className = 'time-task-controls';
+                
+                const timeInputContainer = document.createElement('div');
+                timeInputContainer.className = 'time-input-container';
+                
+                const timeInput = document.createElement('input');
+                timeInput.type = 'number';
+                timeInput.min = '0';
+                timeInput.placeholder = '0';
+                timeInput.value = timeValue;
+                timeInput.className = 'time-input';
+                timeInput.addEventListener('input', function() {
+                    updateTotalTime();
+                    // Обновляем зарплату при изменении времени
+                    if (window.updateSalaryFromTime) {
+                        setTimeout(window.updateSalaryFromTime, 100);
+                    }
+                    // Обновляем итоговый расчет
+                    setTimeout(updateFinalCalculation, 100);
+                    // Обновляем опции времени использования в оборудовании
+                    refreshEquipmentTimeUsageOptions();
+                });
+                
+                const timeUnit = document.createElement('span');
+                timeUnit.className = 'time-unit';
+                timeUnit.textContent = 'мин';
+                
+                timeInputContainer.appendChild(timeInput);
+                timeInputContainer.appendChild(timeUnit);
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-btn';
+                removeButton.textContent = '×';
+                removeButton.addEventListener('click', function() {
+                    timeTasksContainer.removeChild(taskElement);
+                    updateTotalTime();
+                    // Обновляем зарплату при удалении задачи
+                    if (window.updateSalaryFromTime) {
+                        setTimeout(window.updateSalaryFromTime, 100);
+                    }
+                    // Обновляем итоговый расчет
+                    setTimeout(updateFinalCalculation, 100);
+                    // Обновляем опции времени использования в оборудовании
+                    refreshEquipmentTimeUsageOptions();
+                });
+                
+                taskControls.appendChild(timeInputContainer);
+                taskControls.appendChild(removeButton);
+                
+                taskHeader.appendChild(dragHandle);
+                taskHeader.appendChild(nameInput);
+                taskHeader.appendChild(taskControls);
+                
+                const descriptionElement = document.createElement('div');
+                descriptionElement.className = 'time-task-description';
+                descriptionElement.textContent = taskDescription;
+                
+                taskElement.appendChild(taskHeader);
+                taskElement.appendChild(descriptionElement);
+                
+                // Добавляем обработчики для перетаскивания
+                taskElement.addEventListener('dragstart', handleDragStart);
+                taskElement.addEventListener('dragover', handleDragOver);
+                taskElement.addEventListener('drop', handleDrop);
+                taskElement.addEventListener('dragend', handleDragEnd);
+                
+                timeTasksContainer.appendChild(taskElement);
+            }
+
+            // Функции для перетаскивания
+            let draggedItem = null;
+
+            function handleDragStart(e) {
+                draggedItem = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.innerHTML);
+                this.style.opacity = '0.4';
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            }
+
+            function handleDrop(e) {
+                e.stopPropagation();
+                if (draggedItem !== this) {
+                    timeTasksContainer.insertBefore(draggedItem, this.nextSibling);
+                }
+                return false;
+            }
+
+            function handleDragEnd(e) {
+                this.style.opacity = '1';
+            }
+
+            function updateTotalTime() {
+                let totalMinutes = 0;
+                const timeInputs = document.querySelectorAll('.time-task .time-input');
+                
+                timeInputs.forEach(input => {
+                    totalMinutes += parseFloat(input.value) || 0;
+                });
+                
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = Math.round(totalMinutes % 60);
+                
+                totalTimeElement.textContent = `${hours} часов ${minutes} минут`;
+            }
+            
+            // Первоначальный расчет общего времени
+            updateTotalTime();
+        }
+
+        // Получение данных раздела временных затрат
+        function getTimeData() {
+            const tasks = document.querySelectorAll('.time-task');
+            return Array.from(tasks).map(task => {
+                const nameInput = task.querySelector('.time-task-name');
+                const descriptionElement = task.querySelector('.time-task-description');
+                const timeInput = task.querySelector('.time-input');
+                
+                return {
+                    name: nameInput.value,
+                    description: descriptionElement.textContent,
+                    time: timeInput.value
+                };
+            });
+        }
+
+        // Загрузка данных раздела временных затрат
+        function loadTimeData(data) {
+            if (!data) return;
+            
+            const timeTasksContainer = document.getElementById('time-tasks-container');
+            timeTasksContainer.innerHTML = '';
+            
+            if (data.length > 0) {
+                data.forEach(task => {
+                    addTimeTask(task.name, task.description, task.time);
+                });
+            } else {
+                // Добавляем задачи по умолчанию, если нет данных
+                initTime();
+            }
+            
+            updateTotalTime();
+        }
+
+        // Инициализация раздела амортизации
+        function initAmortization() {
+            const equipmentContainer = document.getElementById('equipment-container');
+            const addEquipmentBtn = document.getElementById('add-equipment');
+            
+            // Добавление нового оборудования
+            addEquipmentBtn.addEventListener('click', function() {
+                addEquipmentItem();
+            });
+            
+            // Исправленная функция добавления оборудования
+            function addEquipmentItem(equipmentData = {}) {
+                const equipmentItem = document.createElement('div');
+                equipmentItem.className = 'equipment-item';
+                
+                // Получаем актуальную валюту
+                const currency = document.getElementById('currency').value;
+                const customCurrency = document.getElementById('custom-currency').value;
+                const currencySymbol = currency === 'custom' ? customCurrency : currency;
+                
+                equipmentItem.innerHTML = `
+                    <div class="equipment-row">
+                        <div>
+                            <label>Название</label>
+                            <input type="text" value="${equipmentData.name || ''}" placeholder="Название оборудования" class="equipment-name">
+                        </div>
+                        <div>
+                            <label>Цена</label>
+                            <input type="number" value="${equipmentData.price || ''}" min="0" step="0.01" placeholder="0.00" class="equipment-price">
+                        </div>
+                        <div>
+                            <label>Срок службы (лет)</label>
+                            <input type="number" value="${equipmentData.lifespan || ''}" min="0" step="0.1" placeholder="0.0" class="equipment-lifespan">
+                        </div>
+                        <div>
+                            <label>Мощность (Вт)</label>
+                            <input type="number" value="${equipmentData.power || ''}" min="0" step="0.1" placeholder="0.0" class="equipment-power">
+                        </div>
+                        <button class="remove-btn remove-equipment-btn">×</button>
+                    </div>
+                    <div class="time-usage-section">
+                        <label>Время использования (выберите задачи из временных затрат):</label>
+                        <div class="time-usage-options" id="time-usage-options-${Date.now()}">
+                            <!-- Будет заполнено динамически -->
+                        </div>
+                    </div>
+                    <div class="equipment-total">
+                        Амортизация на изделие: <span class="equipment-cost">0.00</span> 
+                    </div>
+                `;
+                
+                // Заполнение опций времени использования
+                const timeUsageOptions = equipmentItem.querySelector('.time-usage-options');
+                updateEquipmentTimeUsageOptions(timeUsageOptions, equipmentData);
+                
+                // Исправленный обработчик удаления
+                const removeBtn = equipmentItem.querySelector('.remove-equipment-btn');
+                removeBtn.addEventListener('click', function() {
+                    if (equipmentContainer.contains(equipmentItem)) {
+                        equipmentContainer.removeChild(equipmentItem);
+                        // Обновляем итоговый расчет при удалении оборудования
+                        setTimeout(updateFinalCalculation, 100);
+                    }
+                });
+                
+                // Обработчики изменений для пересчета стоимости
+                const inputs = equipmentItem.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        calculateEquipmentCost.call(equipmentItem);
+                        // Обновляем итоговый расчет
+                        setTimeout(updateFinalCalculation, 100);
+                    });
+                });
+                
+                equipmentContainer.appendChild(equipmentItem);
+                
+                // Первоначальный расчет стоимости
+                calculateEquipmentCost.call(equipmentItem);
+            }
+            
+            // Функция обновления опций времени использования для оборудования
+            function updateEquipmentTimeUsageOptions(container, equipmentData = {}) {
+                container.innerHTML = '';
+                
+                const timeTasks = document.querySelectorAll('.time-task .time-task-name');
+                
+                timeTasks.forEach((task, index) => {
+                    const taskName = task.value;
+                    if (taskName) {
+                        const option = document.createElement('div');
+                        option.className = 'time-usage-option';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = taskName;
+                        
+                        // По умолчанию ставим галочку на все задачи
+                        checkbox.checked = true;
+                        
+                        // Проверяем, была ли эта задача выбрана в сохраненных данных
+                        if (equipmentData.timeUsage && equipmentData.timeUsage.includes(taskName)) {
+                            checkbox.checked = true;
+                        }
+                        
+                        const label = document.createElement('label');
+                        label.textContent = taskName;
+                        
+                        const percentageInput = document.createElement('input');
+                        percentageInput.type = 'number';
+                        percentageInput.className = 'percentage-input';
+                        percentageInput.min = '0';
+                        percentageInput.max = '100';
+                        percentageInput.step = '1';
+                        percentageInput.value = equipmentData.timeUsagePercentages && equipmentData.timeUsagePercentages[taskName] ? equipmentData.timeUsagePercentages[taskName] : '100';
+                        percentageInput.placeholder = '%';
+                        
+                        option.appendChild(checkbox);
+                        option.appendChild(label);
+                        option.appendChild(percentageInput);
+                        
+                        // Добавляем обработчики для пересчета стоимости при изменении
+                        checkbox.addEventListener('change', function() {
+                            calculateEquipmentCost.call(container.closest('.equipment-item'));
+                            // Обновляем итоговый расчет
+                            setTimeout(updateFinalCalculation, 100);
+                        });
+                        percentageInput.addEventListener('input', function() {
+                            calculateEquipmentCost.call(container.closest('.equipment-item'));
+                            // Обновляем итоговый расчет
+                            setTimeout(updateFinalCalculation, 100);
+                        });
+                        
+                        container.appendChild(option);
+                    }
+                });
+            }
+            
+            // Функция обновления опций времени использования для всего оборудования
+            function refreshEquipmentTimeUsageOptions() {
+                const equipmentItems = document.querySelectorAll('.equipment-item');
+                
+                equipmentItems.forEach(equipmentItem => {
+                    const timeUsageOptions = equipmentItem.querySelector('.time-usage-options');
+                    if (timeUsageOptions) {
+                        // Сохраняем текущие выбранные значения
+                        const currentSelections = {};
+                        const currentOptions = timeUsageOptions.querySelectorAll('.time-usage-option');
+                        
+                        currentOptions.forEach(option => {
+                            const checkbox = option.querySelector('input[type="checkbox"]');
+                            const percentageInput = option.querySelector('.percentage-input');
+                            if (checkbox.checked) {
+                                currentSelections[checkbox.value] = percentageInput.value;
+                            }
+                        });
+                        
+                        // Обновляем опции
+                        updateEquipmentTimeUsageOptions(timeUsageOptions, {
+                            timeUsage: Object.keys(currentSelections),
+                            timeUsagePercentages: currentSelections
+                        });
+                        
+                        // Пересчитываем стоимость
+                        calculateEquipmentCost.call(equipmentItem);
+                    }
+                });
+            }
+            
+            function calculateEquipmentCost() {
+                const equipmentItem = this.closest('.equipment-item') || this;
+                const price = parseFloat(equipmentItem.querySelector('.equipment-price').value) || 0;
+                const lifespan = parseFloat(equipmentItem.querySelector('.equipment-lifespan').value) || 1;
+                
+                // Расчет амортизации в месяц
+                const months = lifespan * 12;
+                const monthlyAmortization = price / months;
+                
+                // Получаем общее время использования этого оборудования
+                let totalEquipmentTime = 0; // в часах
+                
+                const timeUsageOptions = equipmentItem.querySelectorAll('.time-usage-option');
+                timeUsageOptions.forEach(option => {
+                    const checkbox = option.querySelector('input[type="checkbox"]');
+                    const percentageInput = option.querySelector('.percentage-input');
+                    
+                    if (checkbox.checked) {
+                        const taskName = checkbox.value;
+                        const usagePercentage = parseFloat(percentageInput.value) || 100;
+                        
+                        // Находим соответствующую задачу во временных затратам
+                        const timeTasks = document.querySelectorAll('.time-task');
+                        timeTasks.forEach(task => {
+                            const taskInput = task.querySelector('.time-task-name');
+                            if (taskInput.value === taskName) {
+                                const taskTime = parseFloat(task.querySelector('.time-input').value) || 0;
+                                totalEquipmentTime += (taskTime / 60) * (usagePercentage / 100);
+                            }
+                        });
+                    }
+                });
+                
+                // Расчет общей стоимости амортизации для изделия
+                const plannedWorkHours = parseFloat(document.getElementById('planned-work-hours').value) || 160;
+                const productAmortization = (monthlyAmortization / plannedWorkHours) * totalEquipmentTime;
+                
+                // Получаем актуальную валюту
+                const currency = document.getElementById('currency').value;
+                const customCurrency = document.getElementById('custom-currency').value;
+                const currencySymbol = currency === 'custom' ? customCurrency : currency;
+                
+                equipmentItem.querySelector('.equipment-cost').textContent = productAmortization.toFixed(2) + ' ' + currencySymbol;
+                
+                // Обновляем накладные расходы
+                calculateTotalOverhead();
+            }
+            
+            // Инициализация без пустого оборудования
+            // addEquipmentItem(); // Убрали автоматическое добавление пустого оборудования
+        }
+
+        // Получение данных раздела амортизации
+        function getAmortizationData() {
+            const equipmentItems = document.querySelectorAll('.equipment-item');
+            return Array.from(equipmentItems).map(item => {
+                const name = item.querySelector('.equipment-name').value;
+                const price = item.querySelector('.equipment-price').value;
+                const lifespan = item.querySelector('.equipment-lifespan').value;
+                const power = item.querySelector('.equipment-power').value;
+                
+                // Получаем выбранные задачи и проценты использования
+                const timeUsageOptions = item.querySelectorAll('.time-usage-option');
+                const timeUsage = [];
+                const timeUsagePercentages = {};
+                
+                timeUsageOptions.forEach(option => {
+                    const checkbox = option.querySelector('input[type="checkbox"]');
+                    const percentageInput = option.querySelector('.percentage-input');
+                    
+                    if (checkbox.checked) {
+                        timeUsage.push(checkbox.value);
+                        timeUsagePercentages[checkbox.value] = percentageInput.value;
+                    }
+                });
+                
+                return {
+                    name,
+                    price,
+                    lifespan,
+                    power,
+                    timeUsage,
+                    timeUsagePercentages
+                };
+            });
+        }
+
+        // Загрузка данных раздела амортизации
+        function loadAmortizationData(data) {
+            if (!data) return;
+            
+            const equipmentContainer = document.getElementById('equipment-container');
+            equipmentContainer.innerHTML = '';
+            
+            if (data.length > 0) {
+                data.forEach(equipment => {
+                    addEquipmentItem(equipment);
+                });
+            } 
+            // Убрали добавление пустого оборудования при отсутствии данных
+        }
+
+        // Инициализация раздела ЗП
+        function initSalary() {
+            const salaryContainer = document.getElementById('salary-tasks-container');
+            const totalSalaryElement = document.getElementById('total-salary');
+            const salaryCurrencyElement = document.getElementById('salary-currency');
+            
+            // Функция обновления зарплаты из временных затрат
+            window.updateSalaryFromTime = function() {
+                salaryContainer.innerHTML = '';
+                let totalSalary = 0;
+                
+                // Безопасное получение валюты
+                let currencySymbol = 'BYN';
+                try {
+                    const currency = document.getElementById('currency').value;
+                    if (currency === 'custom') {
+                        currencySymbol = document.getElementById('custom-currency').value || 'BYN';
+                    } else {
+                        currencySymbol = currency;
+                    }
+                } catch (e) {
+                    console.log('Ошибка при получении валюты:', e);
+                }
+                
+                const timeTasks = document.querySelectorAll('.time-task');
+                timeTasks.forEach(task => {
+                    const taskName = task.querySelector('.time-task-name').value;
+                    const taskTime = parseFloat(task.querySelector('.time-input').value) || 0;
+                    
+                    if (taskName && taskTime > 0) {
+                        const salaryTask = document.createElement('div');
+                        salaryTask.className = 'salary-task';
+                        
+                        // Стандартная ставка по умолчанию
+                        const hourlyRate = 10;
+                        
+                        const salary = (taskTime / 60) * hourlyRate;
+                        totalSalary += salary;
+                        
+                        salaryTask.innerHTML = `
+                            <input type="text" value="${taskName}" readonly>
+                            <input type="number" value="${taskTime}" readonly>
+                            <input type="number" value="${hourlyRate}" class="hourly-rate" min="0" step="0.01" placeholder="Ставка в ${currencySymbol}/час">
+                            <span>${salary.toFixed(2)} ${currencySymbol}</span>
+                        `;
+                        
+                        // Обработчик изменения ставки
+                        const rateInput = salaryTask.querySelector('.hourly-rate');
+                        rateInput.addEventListener('input', function() {
+                            const newRate = parseFloat(this.value) || 0;
+                            const taskTime = parseFloat(salaryTask.querySelector('input[type="number"]').value) || 0;
+                            const newSalary = (taskTime / 60) * newRate;
+                            salaryTask.querySelector('span').textContent = `${newSalary.toFixed(2)} ${currencySymbol}`;
+                            updateTotalSalary();
+                            setTimeout(updateFinalCalculation, 100);
+                        });
+                        
+                        salaryContainer.appendChild(salaryTask);
+                    }
+                });
+                
+                totalSalaryElement.textContent = totalSalary.toFixed(2);
+                salaryCurrencyElement.textContent = currencySymbol;
+                setTimeout(updateFinalCalculation, 100);
+            }
+            
+            // Функция обновления общей зарплаты
+            function updateTotalSalary() {
+                let total = 0;
+                const salaryTasks = document.querySelectorAll('.salary-task');
+                
+                salaryTasks.forEach(task => {
+                    const salaryText = task.querySelector('span').textContent;
+                    const salary = parseFloat(salaryText) || 0;
+                    total += salary;
+                });
+                
+                totalSalaryElement.textContent = total.toFixed(2);
+            }
+            
+            // Инициализация при загрузке страницы
+            window.updateSalaryFromTime();
+        }
+
+        // Получение данных раздела ЗП
+        function getSalaryData() {
+            const salaryTasks = document.querySelectorAll('.salary-task');
+            return Array.from(salaryTasks).map(task => {
+                const inputs = task.querySelectorAll('input');
+                const salary = task.querySelector('span').textContent;
+                return {
+                    name: inputs[0].value,
+                    time: inputs[1].value,
+                    rate: inputs[2].value,
+                    salary: parseFloat(salary) || 0
+                };
+            });
+        }
+
+        // Загрузка данных раздела ЗП
+        function loadSalaryData(data) {
+            if (!data) return;
+            
+            const salaryContainer = document.getElementById('salary-tasks-container');
+            salaryContainer.innerHTML = '';
+            
+            if (data.length > 0) {
+                let totalSalary = 0;
+                
+                data.forEach(task => {
+                    const salaryTask = document.createElement('div');
+                    salaryTask.className = 'salary-task';
+                    
+                   // Получаем валюту из раздела описания
+                    const currency = document.getElementById('currency').value;
+                    let currencySymbol = currency;
+                    if (currency === 'custom') {
+                        currencySymbol = document.getElementById('custom-currency').value || 'BYN';
+                    }
+                    const salary = (parseFloat(task.time) / 60) * parseFloat(task.rate);
+                    totalSalary += salary;
+                    
+                    salaryTask.innerHTML = `
+                        <input type="text" value="${task.name}" readonly>
+                        <input type="number" value="${task.time}" readonly>
+                        <input type="number" value="${task.rate}" class="hourly-rate" min="0" step="0.01" placeholder="Ставка в ${currencySymbol}/час">
+                        <span>${salary.toFixed(2)} ${currencySymbol}</span>
+                    `;
+                    
+                    // Обработчик изменения ставки
+                    const rateInput = salaryTask.querySelector('.hourly-rate');
+                    rateInput.addEventListener('input', function() {
+                        const newRate = parseFloat(this.value) || 0;
+                        const taskTime = parseFloat(salaryTask.querySelector('input[type="number"]').value) || 0;
+                        const newSalary = (taskTime / 60) * newRate;
+                        salaryTask.querySelector('span').textContent = `${newSalary.toFixed(2)} ${currencySymbol}`;
+                        updateTotalSalary();
+                        // Обновляем итоговый расчет
+                        setTimeout(updateFinalCalculation, 100);
+                    });
+                    
+                    salaryContainer.appendChild(salaryTask);
+                });
+                
+                document.getElementById('total-salary').textContent = totalSalary.toFixed(2);
+            } else {
+                // Если нет данных, обновляем из временных затрат
+                window.updateSalaryFromTime();
+            }
+        }
+
+        // Инициализация раздела упаковки и доставки
+        function initPackaging() {
+            const packagingContainer = document.getElementById('packaging-container');
+            const deliveryContainer = document.getElementById('delivery-container');
+            const addPackagingBtn = document.getElementById('add-packaging');
+            const addDeliveryBtn = document.getElementById('add-delivery');
+            
+            // Добавление новой упаковки
+            addPackagingBtn.addEventListener('click', function() {
+                addPackagingItem();
+            });
+            
+            // Добавление новой доставки
+            addDeliveryBtn.addEventListener('click', function() {
+                addDeliveryItem();
+            });
+            
+            function addPackagingItem(packagingData = {}) {
+                const packagingItem = document.createElement('div');
+                packagingItem.className = 'packaging-item';
+                
+                packagingItem.innerHTML = `
+                    <input type="text" value="${packagingData.type || ''}" placeholder="Тип упаковки" class="packaging-type">
+                    <input type="text" value="${packagingData.note || ''}" placeholder="Примечание" class="packaging-note">
+                    <input type="number" value="${packagingData.cost || ''}" min="0" step="0.01" placeholder="0.00" class="packaging-cost">
+                    <button class="remove-btn remove-packaging-btn">×</button>
+                `;
+                
+                // Обработчик удаления
+                const removeBtn = packagingItem.querySelector('.remove-packaging-btn');
+                removeBtn.addEventListener('click', function() {
+                    packagingContainer.removeChild(packagingItem);
+                    updatePackagingDeliveryTotal();
+                    setTimeout(updateFinalCalculation, 100);
+                });
+                
+                // Обработчики изменений для пересчета стоимости
+                const inputs = packagingItem.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        updatePackagingDeliveryTotal();
+                        setTimeout(updateFinalCalculation, 100);
+                    });
+                });
+                
+                packagingContainer.appendChild(packagingItem);
+                
+                // Первоначальный расчет стоимости
+                updatePackagingDeliveryTotal();
+            }
+            
+            function addDeliveryItem(deliveryData = {}) {
+                const deliveryItem = document.createElement('div');
+                deliveryItem.className = 'delivery-item';
+                
+                deliveryItem.innerHTML = `
+                    <input type="text" value="${deliveryData.type || ''}" placeholder="Тип доставки" class="delivery-type">
+                    <input type="text" value="${deliveryData.note || ''}" placeholder="Примечание" class="delivery-note">
+                    <input type="number" value="${deliveryData.cost || ''}" min="0" step="0.01" placeholder="0.00" class="delivery-cost">
+                    <button class="remove-btn remove-delivery-btn">×</button>
+                `;
+                
+                // Обработчик удаления
+                const removeBtn = deliveryItem.querySelector('.remove-delivery-btn');
+                removeBtn.addEventListener('click', function() {
+                    deliveryContainer.removeChild(deliveryItem);
+                    updatePackagingDeliveryTotal();
+                    setTimeout(updateFinalCalculation, 100);
+                });
+                
+                // Обработчики изменений для пересчета стоимости
+                const inputs = deliveryItem.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        updatePackagingDeliveryTotal();
+                        setTimeout(updateFinalCalculation, 100);
+                    });
+                });
+                
+                deliveryContainer.appendChild(deliveryItem);
+                
+                // Первоначальный расчет стоимости
+                updatePackagingDeliveryTotal();
+            }
+            
+            // Функция обновления общей стоимости упаковки и доставки
+            function updatePackagingDeliveryTotal() {
+                let total = 0;
+                
+                // Суммируем стоимость упаковки
+                const packagingItems = document.querySelectorAll('.packaging-item');
+                packagingItems.forEach(item => {
+                    const cost = parseFloat(item.querySelector('.packaging-cost').value) || 0;
+                    total += cost;
+                });
+                
+                // Суммируем стоимость доставки
+                const deliveryItems = document.querySelectorAll('.delivery-item');
+                deliveryItems.forEach(item => {
+                    const cost = parseFloat(item.querySelector('.delivery-cost').value) || 0;
+                    total += cost;
+                });
+                
+                // Получаем валюту для отображения
+                const currency = document.getElementById('currency').value;
+                const customCurrency = document.getElementById('custom-currency').value;
+                const currencySymbol = currency === 'custom' ? customCurrency : currency;
+                
+                document.getElementById('total-packaging-delivery').textContent = total.toFixed(2);
+                document.getElementById('packaging-currency').textContent = currencySymbol;
+            }
+            
+            // Добавляем по одному пустому пункту по умолчанию
+            addPackagingItem();
+            addDeliveryItem();
+        }
+
+        // Получение данных раздела упаковки и доставки
+        function getPackagingData() {
+            const packagingItems = document.querySelectorAll('.packaging-item');
+            const deliveryItems = document.querySelectorAll('.delivery-item');
+            
+            return {
+                packaging: Array.from(packagingItems).map(item => {
+                    return {
+                        type: item.querySelector('.packaging-type').value,
+                        note: item.querySelector('.packaging-note').value,
+                        cost: item.querySelector('.packaging-cost').value
+                    };
+                }),
+                delivery: Array.from(deliveryItems).map(item => {
+                    return {
+                        type: item.querySelector('.delivery-type').value,
+                        note: item.querySelector('.delivery-note').value,
+                        cost: item.querySelector('.delivery-cost').value
+                    };
+                })
+            };
+        }
+
+        // Загрузка данных раздела упаковки и доставки
+        function loadPackagingData(data) {
+            if (!data) return;
+            
+            const packagingContainer = document.getElementById('packaging-container');
+            const deliveryContainer = document.getElementById('delivery-container');
+            packagingContainer.innerHTML = '';
+            deliveryContainer.innerHTML = '';
+            
+            if (data.packaging && data.packaging.length > 0) {
+                data.packaging.forEach(packaging => {
+                    addPackagingItem(packaging);
+                });
+            } else {
+                // Добавляем пустую упаковку, если нет данных
+                addPackagingItem();
+            }
+            
+            if (data.delivery && data.delivery.length > 0) {
+                data.delivery.forEach(delivery => {
+                    addDeliveryItem(delivery);
+                });
+            } else {
+                // Добавляем пустую доставку, если нет данных
+                addDeliveryItem();
+            }
+        }
+
+        // Функция расчета общих накладных расходов
+        function calculateTotalOverhead() {
+            // Суммируем все фиксированные расходы
+            let totalMonthly = 0;
+            
+            // Коммунальные услуги
+            const waterTariff = parseFloat(document.getElementById('water-tariff').value) || 0;
+            const heatingTariff = parseFloat(document.getElementById('heating-tariff').value) || 0;
+            totalMonthly += waterTariff;
+            totalMonthly += heatingTariff;
+            
+            // Расходные материалы и маркетинг
+            totalMonthly += parseFloat(document.getElementById('office-supplies').value) || 0;
+            totalMonthly += parseFloat(document.getElementById('tags-materials').value) || 0;
+            totalMonthly += parseFloat(document.getElementById('marketing-cost').value) || 0;
+            
+            // Постоянные ежемесячные платежи
+            const monthlyPayments = document.querySelectorAll('.monthly-payment-item input[type="number"]');
+            monthlyPayments.forEach(payment => {
+                const amount = parseFloat(payment.value) || 0;
+                totalMonthly += amount;
+            });
+            
+            // Обновляем отображение общей суммы
+            const currencySymbol = getCurrentCurrencySymbol();
+            document.getElementById('total-monthly-overhead').textContent = `${totalMonthly.toFixed(2)} ${currencySymbol}/мес`;
+            
+            // Расчет стоимости электроэнергии на изделие
+            const electricityCost = calculateElectricityCost();
+            
+            // Расчет стоимости накладных расходов на изделие
+            calculateOverheadCostPerProduct(totalMonthly, electricityCost);
+        }
+
+        // Функция получения текущего символа валюты
+        function getCurrentCurrencySymbol() {
+            const currency = document.getElementById('currency').value;
+            const customCurrency = document.getElementById('custom-currency').value;
+            return currency === 'custom' ? customCurrency : currency;
+        }
+
+        // Инициализация раздела накладных расходов
+        function initOverhead() {
+            // Обработчики изменений для всех полей накладных расходов
+            const overheadInputs = document.querySelectorAll('#overhead input');
+            overheadInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    calculateTotalOverhead();
+                    // Обновляем итоговый расчет
+                    setTimeout(updateFinalCalculation, 100);
+                });
+            });
+            
+            // Первоначальный расчет
+            calculateTotalOverhead();
+        }
+
+        // Расчет стоимости электроэнергии на изделие
+        function calculateElectricityCost() {
+            const electricityTariff = parseFloat(document.getElementById('electricity-tariff').value) || 0.2;
+            let totalElectricityCost = 0;
+            
+            // Проходим по всем оборудованию и считаем потребление электроэнергии
+            const equipmentItems = document.querySelectorAll('.equipment-item');
+            equipmentItems.forEach(item => {
+                const power = parseFloat(item.querySelector('.equipment-power').value) || 0;
+                
+                // Получаем общее время использования этого оборудования
+                let totalEquipmentTime = 0; // в часах
+                
+                const timeUsageOptions = item.querySelectorAll('.time-usage-option');
+                timeUsageOptions.forEach(option => {
+                    const checkbox = option.querySelector('input[type="checkbox"]');
+                    const percentageInput = option.querySelector('.percentage-input');
+                    
+                    if (checkbox.checked) {
+                        const taskName = checkbox.value;
+                        const usagePercentage = parseFloat(percentageInput.value) || 100;
+                        
+                        // Находим соответствующую задачу во временных затратах
+                        const timeTasks = document.querySelectorAll('.time-task');
+                        timeTasks.forEach(task => {
+                            const taskInput = task.querySelector('.time-task-name');
+                            if (taskInput.value === taskName) {
+                                const taskTime = parseFloat(task.querySelector('.time-input').value) || 0;
+                                totalEquipmentTime += (taskTime / 60) * (usagePercentage / 100);
+                            }
+                        });
+                    }
+                });
+                
+                // Расчет стоимости электроэнергии для этого оборудования
+                const electricityConsumption = (power * totalEquipmentTime) / 1000; // кВт·ч
+                const electricityCost = electricityConsumption * electricityTariff;
+                
+                totalElectricityCost += electricityCost;
+            });
+            
+            return totalElectricityCost;
+        }
+
+        // Расчет стоимости накладных расходов на изделие
+        function calculateOverheadCostPerProduct(totalMonthlyOverhead, electricityCost) {
+            // Получаем общее время производства изделия
+            const totalTimeMinutes = calculateTotalTimeMinutes();
+            const totalTimeHours = totalTimeMinutes / 60;
+            
+            // Получаем плановое количество рабочих часов в месяц
+            const plannedWorkHours = parseFloat(document.getElementById('planned-work-hours').value) || 160;
+            
+            // Расчет стоимости накладных расходов на изделие
+            // (Сумма накладных расходов в месяц / Плановое количество часов в месяц) * Время производства изделия
+            const overheadCostPerProduct = (totalMonthlyOverhead / plannedWorkHours) * totalTimeHours;
+            
+            // Добавляем стоимость электроэнергии и других коммунальных услуг
+            const waterTariff = parseFloat(document.getElementById('water-tariff').value) || 0;
+            const heatingTariff = parseFloat(document.getElementById('heating-tariff').value) || 0;
+            
+            // Расчет доли коммунальных услуг на изделие
+            const utilitiesShare = ((waterTariff + heatingTariff) / plannedWorkHours) * totalTimeHours;
+            const totalUtilitiesCost = electricityCost + utilitiesShare;
+            
+            // Общая стоимость накладных расходов на изделие
+            const totalOverheadCost = overheadCostPerProduct + totalUtilitiesCost;
+            
+            // Обновляем отображение
+            const currencySymbol = getCurrentCurrencySymbol();
+            document.getElementById('utilities-cost').textContent = `${totalUtilitiesCost.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('overhead-cost-per-product').textContent = `${totalOverheadCost.toFixed(2)} ${currencySymbol}`;
+            
+            return totalOverheadCost;
+        }
+
+        // Получение данных раздела накладных расходов
+        function getOverheadData() {
+            const monthlyPayments = [];
+            const monthlyPaymentItems = document.querySelectorAll('.monthly-payment-item');
+            
+            monthlyPaymentItems.forEach(item => {
+                const amountInput = item.querySelector('input[type="number"]');
+                
+                monthlyPayments.push({
+                    amount: amountInput.value
+                });
+            });
+            
+            return {
+                electricityTariff: document.getElementById('electricity-tariff').value,
+                waterTariff: document.getElementById('water-tariff').value,
+                heatingTariff: document.getElementById('heating-tariff').value,
+                officeSupplies: document.getElementById('office-supplies').value,
+                tagsMaterials: document.getElementById('tags-materials').value,
+                marketingCost: document.getElementById('marketing-cost').value,
+                monthlyPayments: monthlyPayments,
+                plannedWorkHours: document.getElementById('planned-work-hours').value
+            };
+        }
+
+        // Загрузка данных раздела накладных расходов
+        function loadOverheadData(data) {
+            if (!data) return;
+            
+            document.getElementById('electricity-tariff').value = data.electricityTariff || '0.2';
+            document.getElementById('water-tariff').value = data.waterTariff || '10';
+            document.getElementById('heating-tariff').value = data.heatingTariff || '25';
+            document.getElementById('office-supplies').value = data.officeSupplies || '15';
+            document.getElementById('tags-materials').value = data.tagsMaterials || '10';
+            document.getElementById('marketing-cost').value = data.marketingCost || '50';
+            document.getElementById('planned-work-hours').value = data.plannedWorkHours || '160';
+            
+            // Загрузка ежемесячных платежей
+            const monthlyPaymentInputs = document.querySelectorAll('.monthly-payment-item input[type="number"]');
+            if (data.monthlyPayments && data.monthlyPayments.length > 0) {
+                monthlyPaymentInputs.forEach((input, index) => {
+                    if (data.monthlyPayments[index]) {
+                        input.value = data.monthlyPayments[index].amount || '0';
+                    }
+                });
+            }
+            
+            calculateTotalOverhead();
+        }
+
+        // Инициализация раздела Цена
+        function initPrice() {
+            // Обработчики изменений для полей процентов
+            document.getElementById('urgency-percent').addEventListener('input', updateFinalCalculation);
+            document.getElementById('markup-percent').addEventListener('input', updateFinalCalculation);
+            document.getElementById('tax-percent').addEventListener('input', updateFinalCalculation);
+            
+            // Первоначальный расчет
+            setTimeout(updateFinalCalculation, 100);
+        }
+
+        // Обновление итогового расчета
+        function updateFinalCalculation() {
+            // Пересчитываем все зависимые разделы
+            calculateTotalOverhead();
+            
+            // Получаем данные из всех разделов
+            const materialsCost = parseFloat(document.getElementById('total-materials').textContent) || 0;
+            const salaryCost = parseFloat(document.getElementById('total-salary').textContent) || 0;
+            const amortizationCost = calculateAmortizationCost();
+            const packagingCost = parseFloat(document.getElementById('total-packaging-delivery').textContent) || 0;
+            const overheadCost = parseFloat(document.getElementById('overhead-cost-per-product').textContent) || 0;
+            
+            // Себестоимость
+            const costPrice = materialsCost + salaryCost + amortizationCost + packagingCost + overheadCost;
+            
+            // Надбавка за срочность (процент от себестоимости)
+            const urgencyPercent = parseFloat(document.getElementById('urgency-percent').value) || 0;
+            const urgencyAmount = costPrice * (urgencyPercent / 100);
+            
+            // Цена с учетом срочности
+            const priceWithUrgency = costPrice + urgencyAmount;
+            
+            // Наценка (процент от цены с учетом срочности)
+            const markupPercent = parseFloat(document.getElementById('markup-percent').value) || 0;
+            const markupAmount = priceWithUrgency * (markupPercent / 100);
+            
+            // Цена без налога
+            const priceWithoutTax = priceWithUrgency + markupAmount;
+            
+            // Налог (процент от цены без налога)
+            const taxPercent = parseFloat(document.getElementById('tax-percent').value) || 0;
+            const taxAmount = priceWithoutTax * (taxPercent / 100);
+            
+            // Итоговая стоимость
+            const totalPrice = priceWithoutTax + taxAmount;
+            
+            // Получаем валюту для отображения
+            const currencySymbol = getCurrentCurrencySymbol();
+            
+            // Обновляем отображение в таблице
+            document.getElementById('result-materials').textContent = `${materialsCost.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-salary').textContent = `${salaryCost.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-amortization').textContent = `${amortizationCost.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-packaging').textContent = `${packagingCost.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-overhead').textContent = `${overheadCost.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-cost').textContent = `${costPrice.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-urgency').textContent = `${urgencyAmount.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-price-with-urgency').textContent = `${priceWithUrgency.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-markup').textContent = `${markupAmount.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-price-without-tax').textContent = `${priceWithoutTax.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-tax').textContent = `${taxAmount.toFixed(2)} ${currencySymbol}`;
+            document.getElementById('result-total').textContent = `${totalPrice.toFixed(2)} ${currencySymbol}`;
+            
+            // Обновляем проценты
+            document.getElementById('urgency-percent-display').textContent = urgencyPercent;
+            document.getElementById('markup-percent-display').textContent = markupPercent;
+            document.getElementById('tax-percent-display').textContent = taxPercent;
+        }
+
+        // Расчет стоимости амортизации
+        function calculateAmortizationCost() {
+            let total = 0;
+            const equipmentCosts = document.querySelectorAll('.equipment-cost');
+            
+            equipmentCosts.forEach(cost => {
+                const costText = cost.textContent.trim();
+                const costValue = parseFloat(costText) || 0;
+                total += costValue;
+            });
+            
+            return total;
+        }
+
+        // Расчет общего времени в минутах
+        function calculateTotalTimeMinutes() {
+            let totalMinutes = 0;
+            const timeInputs = document.querySelectorAll('.time-task .time-input');
+            
+            timeInputs.forEach(input => {
+                totalMinutes += parseFloat(input.value) || 0;
+            });
+            
+            return totalMinutes;
+        }
+
+        // Получение данных раздела Цена
+        function getPriceData() {
+            return {
+                urgencyPercent: document.getElementById('urgency-percent').value,
+                markupPercent: document.getElementById('markup-percent').value,
+                taxPercent: document.getElementById('tax-percent').value
+            };
+        }
+
+        // Загрузка данных раздела Цена
+        function loadPriceData(data) {
+            if (!data) return;
+            
+            document.getElementById('urgency-percent').value = data.urgencyPercent || '0';
+            document.getElementById('markup-percent').value = data.markupPercent || '10';
+            document.getElementById('tax-percent').value = data.taxPercent || '10';
+            
+            updateFinalCalculation();
+        }
+
+        // Сохранение расчета в истории
+        async function saveCalculationToHistory() {
+            const calculationName = document.getElementById('product-name').value || prompt('Введите название для сохранения расчета:');
+            if (!calculationName) return;
+            
+            const calculationData = {
+                name: calculationName,
+                description: getDescriptionData(),
+                client: getClientData(),
+                materials: getMaterialsData(),
+                time: getTimeData(),
+                amortization: getAmortizationData(),
+                salary: getSalaryData(),
+                packaging: getPackagingData(),
+                overhead: getOverheadData(),
+                price: getPriceData(),
+                totalCost: parseFloat(document.getElementById('result-total').textContent) || 0,
+                costPrice: parseFloat(document.getElementById('result-cost').textContent) || 0,
+                markupAmount: parseFloat(document.getElementById('result-markup').textContent) || 0,
+                taxAmount: parseFloat(document.getElementById('result-tax').textContent) || 0,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const id = await window.calculationDB.saveCalculation(calculationData);
+                
+                // Сохраняем изображение отдельно если есть
+                const photoData = document.getElementById('preview-image').src;
+                if (photoData && photoData !== '#') {
+                    await window.calculationDB.saveImage(id, photoData);
+                }
+                
+                alert('Расчет сохранен в базе данных!');
+                await initHistory(); // Обновляем историю
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                alert('Ошибка при сохранении расчета');
+            }
+        }
+
+        // Инициализация истории расчетов
+        async function initHistory() {
+            const historyContainer = document.getElementById('history-container');
+            
+            try {
+                const calculations = await window.calculationDB.getAllCalculations();
+                
+                // Обработчик поиска
+                const searchInput = document.getElementById('history-search');
+                searchInput.addEventListener('input', function() {
+                    filterHistory(this.value);
+                });
+                
+                if (calculations.length === 0) {
+                    historyContainer.innerHTML = '<p>Нет сохраненных расчетов</p>';
+                    return;
+                }
+                
+                displayHistory(calculations);
+            } catch (error) {
+                console.error('Ошибка загрузки истории:', error);
+                historyContainer.innerHTML = '<p>Ошибка загрузки истории расчетов</p>';
+            }
+        }
+
+        // Функция отображения истории
+        function displayHistory(calculations) {
+            const historyContainer = document.getElementById('history-container');
+            historyContainer.innerHTML = '<div class="history-grid" id="history-grid"></div>';
+            const historyGrid = document.getElementById('history-grid');
+            
+            // Сортируем историю по дате (новые сверху)
+            calculations.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            calculations.forEach((calculation) => {
+                const historyCard = document.createElement('div');
+                historyCard.className = 'history-card';
+                
+                const date = new Date(calculation.timestamp);
+                const formattedDate = formatDate(date);
+                
+                // Получаем валюту для отображения
+                const currency = calculation.description?.currency || 'BYN';
+                const customCurrency = calculation.description?.customCurrency || '';
+                const currencySymbol = currency === 'custom' ? customCurrency : currency;
+                
+                // Формируем содержимое карточки
+                let cardContent = '';
+                
+                // Добавляем изображение, если есть
+                if (calculation.description && calculation.description.photoData && calculation.description.photoData !== '#') {
+                    cardContent += `<img src="${calculation.description.photoData}" class="history-card-image" alt="${calculation.name || 'Изделие'}">`;
+                }
+                
+                // Добавляем название
+                cardContent += `<div class="history-card-title">${calculation.name || 'Без названия'}</div>`;
+                
+                // Добавляем дату создания/редактирования
+                cardContent += `<div class="history-card-date">${formattedDate}</div>`;
+                
+                // Добавляем ФИО клиента, если есть
+                if (calculation.client && calculation.client.fio) {
+                    cardContent += `<div class="history-card-client">Клиент: ${calculation.client.fio}</div>`;
+                }
+                
+                // Добавляем цену
+                cardContent += `
+                    <div class="history-card-price">Цена: ${calculation.totalCost ? calculation.totalCost.toFixed(2) : '0.00'} ${currencySymbol}</div>
+                `;
+                
+                // Добавляем кнопки действий
+                cardContent += `
+                    <div class="history-card-actions">
+                        <button class="history-card-btn edit" data-id="${calculation.id}">Редактировать</button>
+                       <button class="history-card-btn delete" data-id="${calculation.id}">Удалить</button>
+                    </div>
+                `;
+                
+                historyCard.innerHTML = cardContent;
+                
+                // Обработчики для кнопок действий
+                const editBtn = historyCard.querySelector('.edit');
+                const deleteBtn = historyCard.querySelector('.delete');
+                
+                // Обработчик для кнопки редактирования
+                editBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = parseInt(this.getAttribute('data-id'));
+                    loadCalculationFromHistory(id);
+                    showSection('description');
+                    
+                    // Обновление активной вкладки
+                    const navTabs = document.querySelectorAll('.nav-tab');
+                    navTabs.forEach(tab => {
+                        tab.classList.remove('active');
+                        if (tab.getAttribute('data-section') === 'description') {
+                            tab.classList.add('active');
+                        }
+                    });
+                    
+                    alert('Расчет загружен для редактирования!');
+                });
+                
+                               
+                // Обработчик для кнопки удаления
+                deleteBtn.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    const id = parseInt(this.getAttribute('data-id'));
+                    if (confirm('Удалить этот расчет?')) {
+                        try {
+                            await window.calculationDB.deleteCalculation(id);
+                            alert('Расчет удален!');
+                            await initHistory();
+                        } catch (error) {
+                            console.error('Ошибка удаления:', error);
+                            alert('Ошибка при удалении расчета');
+                        }
+                    }
+                });
+                
+                historyGrid.appendChild(historyCard);
+            });
+        }
+
+        // Функция фильтрации истории
+        async function filterHistory(searchTerm) {
+            try {
+                const calculations = await window.calculationDB.getAllCalculations();
+                
+                if (!searchTerm) {
+                    displayHistory(calculations);
+                    return;
+                }
+                
+                // Преобразуем поисковый запрос в регулярное выражение
+                const searchPattern = searchTerm
+                    .replace(/%/g, '.*') // Заменяем % на .* для любого количества символов
+                    .replace(/\s+/g, '.*'); // Заменяем пробелы на .*
+                
+                const regex = new RegExp(searchPattern, 'i');
+                
+                const filteredHistory = calculations.filter(calculation => {
+                    // Поиск по названию
+                    if (calculation.name && regex.test(calculation.name)) {
+                        return true;
+                    }
+                    
+                    // Поиск по ФИО клиента
+                    if (calculation.client && calculation.client.fio && regex.test(calculation.client.fio)) {
+                        return true;
+                    }
+                    
+                    return false;
+                });
+                
+                displayHistory(filteredHistory);
+            } catch (error) {
+                console.error('Ошибка фильтрации:', error);
+            }
+        }
+
+        // Загрузка расчета из истории
+        async function loadCalculationFromHistory(id) {
+            try {
+                const calculations = await window.calculationDB.getAllCalculations();
+                const calculation = calculations.find(calc => calc.id === id);
+                
+                if (calculation) {
+                    loadDescriptionData(calculation.description);
+                    loadClientData(calculation.client);
+                    loadMaterialsData(calculation.materials);
+                    loadTimeData(calculation.time);
+                    loadAmortizationData(calculation.amortization);
+                    loadSalaryData(calculation.salary);
+                    loadPackagingData(calculation.packaging);
+                    loadOverheadData(calculation.overhead);
+                    loadPriceData(calculation.price);
+                    
+                    // Загружаем изображение если есть
+                    const imageData = await window.calculationDB.getImage(id);
+                    if (imageData && imageData.imageData) {
+                        document.getElementById('preview-image').src = imageData.imageData;
+                        document.getElementById('image-preview-container').style.display = 'block';
+                    }
+                    
+                    setTimeout(updateFinalCalculation, 200);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки расчета:', error);
+                alert('Ошибка при загрузке расчета');
+            }
+        }
+
+        // Функция форматирования даты
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            
+            return `${day}.${month}.${year} ${hours}:${minutes}`;
+        }
+    </script>
+
+</body>
+</html>
